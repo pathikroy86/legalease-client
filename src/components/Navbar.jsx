@@ -67,8 +67,8 @@ const Navbar = () => {
                                 <Link
                                     href={link.href}
                                     className={`block whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold transition 2xl:px-4 ${isActiveRoute(link.href)
-                                            ? "bg-white text-[#1E3A5F] shadow-sm"
-                                            : "text-slate-600 hover:bg-white hover:text-slate-950"
+                                        ? "bg-white text-[#1E3A5F] shadow-sm"
+                                        : "text-slate-600 hover:bg-white hover:text-slate-950"
                                         }`}
                                 >
                                     {link.label}
@@ -80,8 +80,8 @@ const Navbar = () => {
                             <Link
                                 href="/dashboard"
                                 className={`flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold transition 2xl:px-4 ${isActiveRoute("/dashboard")
-                                        ? "bg-white text-[#1E3A5F] shadow-sm"
-                                        : "text-slate-600 hover:bg-white hover:text-slate-950"
+                                    ? "bg-white text-[#1E3A5F] shadow-sm"
+                                    : "text-slate-600 hover:bg-white hover:text-slate-950"
                                     }`}
                             >
                                 Dashboard
@@ -100,24 +100,21 @@ const Navbar = () => {
                     </div>
 
                     <div className="flex shrink-0 items-center gap-3">
-                        <Button
-                            as={Link}
+                        <Link
                             href="/auth/signin"
-                            variant="ghost"
                             radius="lg"
-                            className="h-11 whitespace-nowrap px-4 font-semibold text-[#1E3A5F] 2xl:px-5"
+                            className="py-3 text-center rounded-3xl bg-slate-100 whitespace-nowrap px-8 font-semibold text-[#1E3A5F] 2xl:px-8"
                         >
                             Login
-                        </Button>
+                        </Link>
 
-                        <Button
-                            as={Link}
+                        <Link
                             href="/auth/signup"
                             radius="lg"
-                            className="h-11 whitespace-nowrap bg-[#1E3A5F] px-5 font-semibold text-white shadow-lg shadow-[#1E3A5F]/15 hover:bg-[#162c49] 2xl:px-6"
+                            className="py-3 text-center rounded-3xl whitespace-nowrap bg-[#1E3A5F] px-5 font-semibold text-white shadow-lg shadow-[#1E3A5F]/15 hover:bg-[#162c49] 2xl:px-6"
                         >
                             Get Started
-                        </Button>
+                        </Link>
                     </div>
                 </div>
 
@@ -156,8 +153,8 @@ const Navbar = () => {
                                         href={link.href}
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`block rounded-2xl px-4 py-3 text-sm font-semibold transition ${isActiveRoute(link.href)
-                                                ? "bg-[#EEF4F8] text-[#1E3A5F]"
-                                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
+                                            ? "bg-[#EEF4F8] text-[#1E3A5F]"
+                                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-950"
                                             }`}
                                     >
                                         {link.label}
@@ -167,24 +164,22 @@ const Navbar = () => {
                         </ul>
 
                         <div className="grid grid-cols-1 gap-3 border-t border-slate-200 pt-5">
-                            <Button
-                                as={Link}
+                            <Link
                                 href="/auth/signin"
                                 variant="bordered"
                                 radius="lg"
-                                className="h-11 w-full border-slate-200 font-semibold text-[#1E3A5F]"
+                                className="bg-slate-200  rounded-4xl w-full py-3  text-center border-slate-200 font-semibold text-[#1E3A5F]"
                             >
                                 Login
-                            </Button>
+                            </Link>
 
-                            <Button
-                                as={Link}
+                            <Link
                                 href="/auth/signup"
                                 radius="lg"
-                                className="h-11 w-full bg-[#1E3A5F] font-semibold text-white"
+                                className="py-3 text-center rounded-4xl w-full bg-[#1E3A5F] font-semibold text-white"
                             >
                                 Sign Up
-                            </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>

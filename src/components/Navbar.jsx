@@ -11,6 +11,7 @@ import {
     ScalesBalanced,
     ChevronDown,
 } from "@gravity-ui/icons";
+import { signOut, useSession } from "@/lib/auth-client";
 
 const navLinks = [
     {
@@ -34,6 +35,25 @@ const navLinks = [
 const Navbar = () => {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { data: session } = useSession();
+
+    const user = session?.user;
+
+    const handleSignOut = async () => {
+        await signOut();
+    };
+
+    const getInitials = (name = "") => {
+        const initials = name
+            .split(" ")
+            .filter(Boolean)
+            .map((part) => part[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase();
+
+        return initials || "U";
+    };
 
     const isActiveRoute = (href) => {
         if (href === "/") return pathname === "/";
@@ -100,21 +120,43 @@ const Navbar = () => {
                     </div>
 
                     <div className="flex shrink-0 items-center gap-3">
-                        <Link
-                            href="/auth/signin"
-                            radius="lg"
-                            className="py-3 text-center rounded-3xl bg-slate-100 whitespace-nowrap px-8 font-semibold text-[#1E3A5F] 2xl:px-8"
-                        >
-                            Login
-                        </Link>
+                        {user ? (
+                            <>
+                                <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 py-1.5 pl-2 pr-4">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-bold text-white">
+                                        {getInitials(user.name)}
+                                    </div>
+                                    <span className="max-w-32 truncate text-sm font-semibold text-slate-700">
+                                        {user.name}
+                                    </span>
+                                </div>
 
-                        <Link
-                            href="/auth/signup"
-                            radius="lg"
-                            className="py-3 text-center rounded-3xl whitespace-nowrap bg-[#1E3A5F] px-5 font-semibold text-white shadow-lg shadow-[#1E3A5F]/15 hover:bg-[#162c49] 2xl:px-6"
-                        >
-                            Get Started
-                        </Link>
+                                <Button
+                                    onClick={handleSignOut}
+                                    variant="ghost"
+                                    radius="lg"
+                                    className="h-11 whitespace-nowrap px-5 font-semibold text-[#1E3A5F] bg-slate-100"
+                                >
+                                    Logout
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Link
+                                    href="/auth/signin"
+                                    className="rounded-3xl bg-slate-100 px-8 py-3 text-center font-semibold text-[#1E3A5F]"
+                                >
+                                    Login
+                                </Link>
+
+                                <Link
+                                    href="/auth/signup"
+                                    className="rounded-3xl bg-[#1E3A5F] px-5 py-3 text-center font-semibold text-white shadow-lg shadow-[#1E3A5F]/15 hover:bg-[#162c49] 2xl:px-6"
+                                >
+                                    Get Started
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
 
@@ -164,22 +206,49 @@ const Navbar = () => {
                         </ul>
 
                         <div className="grid grid-cols-1 gap-3 border-t border-slate-200 pt-5">
-                            <Link
-                                href="/auth/signin"
-                                variant="bordered"
-                                radius="lg"
-                                className="bg-slate-200  rounded-4xl w-full py-3  text-center border-slate-200 font-semibold text-[#1E3A5F]"
-                            >
-                                Login
-                            </Link>
+                            {user ? (
+                                <>
+                                    <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-bold text-white">
+                                            {getInitials(user.name)}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-bold text-slate-900">
+                                                {user.name}
+                                            </p>
+                                            <p className="truncate text-xs font-medium text-slate-500">
+                                                {user.email}
+                                            </p>
+                                        </div>
+                                    </div>
 
-                            <Link
-                                href="/auth/signup"
-                                radius="lg"
-                                className="py-3 text-center rounded-4xl w-full bg-[#1E3A5F] font-semibold text-white"
-                            >
-                                Sign Up
-                            </Link>
+                                    <Button
+                                        onClick={handleSignOut}
+                                        radius="lg"
+                                        className="h-11 w-full bg-[#1E3A5F] font-semibold text-white"
+                                    >
+                                        Logout
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        href="/auth/signin"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="w-full rounded-4xl bg-slate-200 py-3 text-center font-semibold text-[#1E3A5F]"
+                                    >
+                                        Login
+                                    </Link>
+
+                                    <Link
+                                        href="/auth/signup"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="w-full rounded-4xl bg-[#1E3A5F] py-3 text-center font-semibold text-white"
+                                    >
+                                        Sign Up
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

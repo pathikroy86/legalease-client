@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 import { Magnifier } from "@gravity-ui/icons";
+import { motion } from "framer-motion";
 
 const advocate = {
     name: "Sarah Rahman",
@@ -14,26 +15,51 @@ const advocate = {
         "120+ consultations across startup contracts, compliance, and business disputes.",
 };
 
+const fadeUp = {
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0 },
+};
+
 const Banner = () => {
     return (
         <section className="overflow-hidden bg-[#F8FAFC]">
             <div className="bg-[#1E3A5F]">
                 <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-14 sm:px-6 lg:min-h-[430px] lg:grid-cols-[1fr_460px] lg:px-8 lg:py-0">
-                    {/* Left Content */}
-                    <div className="max-w-2xl">
-                        <p className="text-xs font-bold uppercase tracking-wide text-[#C9A646] sm:text-sm">
+                    <motion.div
+                        className="max-w-2xl"
+                        initial="hidden"
+                        animate="visible"
+                        transition={{ staggerChildren: 0.12 }}
+                    >
+                        <motion.p
+                            variants={fadeUp}
+                            transition={{ duration: 0.55, ease: "easeOut" }}
+                            className="text-xs font-bold uppercase tracking-wide text-[#C9A646] sm:text-sm"
+                        >
                             Online lawyer hiring platform
-                        </p>
+                        </motion.p>
 
-                        <h1 className="mt-7 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-[56px]">
-                        Find & Hire Expert Legal Counsel
-                        </h1>
+                        <motion.h1
+                            variants={fadeUp}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            className="mt-7 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl lg:text-[56px]"
+                        >
+                            Find & Hire Expert Legal Counsel
+                        </motion.h1>
 
-                        <p className="mt-5 max-w-xl text-base leading-7 text-slate-200 sm:text-lg">
+                        <motion.p
+                            variants={fadeUp}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            className="mt-5 max-w-xl text-base leading-7 text-slate-200 sm:text-lg"
+                        >
                             Browse verified lawyers, send hiring requests, pay after acceptance, and manage your legal journey from one clean dashboard.
-                        </p>
+                        </motion.p>
 
-                        <div className="mt-8 max-w-[610px] rounded-[10px] bg-white p-2 shadow-xl shadow-slate-950/10">
+                        <motion.div
+                            variants={fadeUp}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                            className="mt-8 max-w-[610px] rounded-[10px] bg-white p-2 shadow-xl shadow-slate-950/10"
+                        >
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                 <div className="relative min-w-0 flex-1">
                                     <Magnifier className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400 sm:hidden" />
@@ -53,15 +79,23 @@ const Banner = () => {
                                     Browse Lawyers
                                 </Button>
                             </div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
 
-                    {/* Advocate Demo Card */}
-                    <div className="lg:justify-self-end">
+                    <motion.div
+                        className="lg:justify-self-end"
+                        initial={{ opacity: 0, x: 36 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+                    >
                         <div className="relative mx-auto max-w-[420px]">
                             <div className="absolute -right-10 top-6 hidden h-[320px] w-[320px] rounded-3xl bg-[#C9A646]/15 lg:block" />
 
-                            <article className="relative rounded-[18px] bg-white p-8 shadow-2xl shadow-slate-950/15">
+                            <motion.article
+                                whileHover={{ scale: 1.02 }}
+                                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                                className="relative rounded-[18px] bg-white p-8 shadow-2xl shadow-slate-950/15"
+                            >
                                 <div className="flex items-start gap-5">
                                     <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-bold text-white">
                                         SR
@@ -113,9 +147,9 @@ const Banner = () => {
                                         Shortlist
                                     </Button>
                                 </div>
-                            </article>
+                            </motion.article>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </section>

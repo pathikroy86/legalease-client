@@ -11,7 +11,7 @@ import {
     Label,
     TextField,
 } from "@heroui/react";
-import { At, Eye, EyeSlash, ShieldKeyhole } from "@gravity-ui/icons";
+import { At, Eye, EyeSlash, ScalesBalanced, ShieldKeyhole } from "@gravity-ui/icons";
 import { signIn } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
@@ -42,20 +42,14 @@ const GoogleIcon = (props) => (
 );
 
 const SigninPage = () => {
-    // Form fields
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
-    // UI states
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
     const router = useRouter();
     const redirectTo = "/";
-
-    const togglePasswordVisibility = () =>
-        setIsPasswordVisible((prev) => !prev);
 
     const handleSignin = async (e) => {
         e.preventDefault();
@@ -79,18 +73,13 @@ const SigninPage = () => {
             });
 
             if (authError) {
-                toast.error(
-                    authError.message ||
-                    "Invalid email or password."
-                );
+                toast.error(authError.message || "Invalid email or password.");
                 return;
             }
 
-            toast.success("Signed in successfully! Redirecting...");
-
+            toast.success("Signed in successfully!");
             setEmail("");
             setPassword("");
-
             router.push(redirectTo);
             router.refresh();
         } catch (err) {
@@ -111,10 +100,7 @@ const SigninPage = () => {
             });
 
             if (authError) {
-                toast.error(
-                    authError.message ||
-                    "Google login could not be started."
-                );
+                toast.error(authError.message || "Google sign in could not be started.");
             }
         } catch (err) {
             console.error(err);
@@ -128,32 +114,27 @@ const SigninPage = () => {
         <section className="min-h-screen bg-[#F8FAFC] px-4 py-12 sm:px-6 lg:px-8">
             <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
                 <div className="rounded-[24px] bg-[#1E3A5F] p-8 text-white shadow-2xl shadow-slate-950/10 lg:p-10">
-                    <p className="text-xs font-bold uppercase tracking-wide text-[#C9A646]">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/10">
+                        <ScalesBalanced className="h-8 w-8 text-[#C9A646]" />
+                    </div>
+                    <p className="mt-8 text-xs font-bold uppercase tracking-wide text-[#C9A646]">
                         Welcome Back
                     </p>
                     <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-                        Continue your legal journey
+                        Sign in to LegalEase
                     </h1>
                     <p className="mt-5 text-base leading-8 text-slate-200">
-                        Login to manage hiring requests, comments, payments, lawyer profiles, and dashboard activity.
+                        Access your account with email and password, or continue securely with Google.
                     </p>
-
-                    <div className="mt-8 rounded-2xl bg-white/10 p-5 ring-1 ring-white/10">
-                        <p className="text-lg font-bold">LegalEase dashboard access</p>
-                        <p className="mt-2 text-sm leading-6 text-slate-200">
-                            Clients can track hiring history. Lawyers can manage requests and services. Admins can oversee users and transactions.
-                        </p>
-                    </div>
                 </div>
 
                 <Card className="border border-slate-200 bg-white p-6 shadow-xl shadow-slate-950/5 sm:p-8">
-                    {/* Header */}
                     <div className="border-b border-slate-100 pb-6">
                         <h2 className="text-2xl font-bold tracking-tight text-slate-950">
                             Login
                         </h2>
                         <p className="mt-2 text-sm text-slate-500">
-                            Enter your credentials to access your account.
+                            Enter your account details to continue.
                         </p>
                     </div>
 
@@ -173,26 +154,19 @@ const SigninPage = () => {
                     <div className="my-6 flex items-center gap-4">
                         <div className="h-px flex-1 bg-slate-200" />
                         <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                            Or Login with email
+                            Or login with email
                         </span>
                         <div className="h-px flex-1 bg-slate-200" />
                     </div>
 
                     <form onSubmit={handleSignin} className="space-y-5">
-                        {/* Email */}
-                        <TextField
-                            isRequired
-                            name="email"
-                            type="email"
-                            className="flex flex-col gap-1.5"
-                        >
-                            <Label className="text-sm font-semibold text-slate-700">
-                                Email
-                            </Label>
+                        <TextField isRequired name="email" type="email" className="flex flex-col gap-1.5">
+                            <Label className="text-sm font-semibold text-slate-700">Email</Label>
                             <InputGroup className="flex h-12 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-[#1E3A5F] focus-within:bg-white">
                                 <At className="h-4 w-4 text-slate-400" />
                                 <Input
                                     type="email"
+                                    value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="you@example.com"
                                     className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
@@ -200,47 +174,28 @@ const SigninPage = () => {
                             </InputGroup>
                         </TextField>
 
-                        {/* Password */}
-                        <TextField
-                            isRequired
-                            name="password"
-                            className="flex flex-col gap-1.5"
-                        >
-                            <div className="flex items-center justify-between gap-3">
-                                <Label className="text-sm font-semibold text-slate-700">
-                                    Password
-                                </Label>
-                                <Link
-                                    href="/auth/forgot-password"
-                                    className="text-xs font-bold text-[#1E3A5F]"
-                                >
-                                    Forgot password?
-                                </Link>
-                            </div>
+                        <TextField isRequired name="password" className="flex flex-col gap-1.5">
+                            <Label className="text-sm font-semibold text-slate-700">Password</Label>
                             <InputGroup className="flex h-12 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-[#1E3A5F] focus-within:bg-white">
                                 <ShieldKeyhole className="h-4 w-4 text-slate-400" />
                                 <Input
                                     type={isPasswordVisible ? "text" : "password"}
+                                    value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Enter your password"
                                     className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
                                 />
                                 <button
                                     type="button"
-                                    onClick={togglePasswordVisibility}
+                                    onClick={() => setIsPasswordVisible((current) => !current)}
                                     className="text-slate-400 transition hover:text-slate-700"
                                     aria-label="toggle password visibility"
                                 >
-                                    {isPasswordVisible ? (
-                                        <EyeSlash className="h-4 w-4" />
-                                    ) : (
-                                        <Eye className="h-4 w-4" />
-                                    )}
+                                    {isPasswordVisible ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
                             </InputGroup>
                         </TextField>
 
-                        {/* Submit */}
                         <Button
                             type="submit"
                             radius="lg"
@@ -254,10 +209,7 @@ const SigninPage = () => {
 
                     <p className="mt-6 border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
                         New to LegalEase?{" "}
-                        <Link
-                            href="/auth/signup"
-                            className="font-bold text-[#1E3A5F]"
-                        >
+                        <Link href="/auth/signup" className="font-bold text-[#1E3A5F]">
                             Create an account
                         </Link>
                     </p>

@@ -5,6 +5,15 @@ import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
 import AbortErrorGuard from "@/components/AbortErrorGuard";
 
+const themeScript = `
+  try {
+    var theme = localStorage.getItem("theme");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+  } catch (err) {}
+`;
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,8 +34,10 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <AbortErrorGuard />
         <Toaster />
         <Navbar></Navbar>

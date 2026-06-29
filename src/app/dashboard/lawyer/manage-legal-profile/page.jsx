@@ -5,6 +5,7 @@ import { Button, Card, Input, InputGroup, Label, TextField } from "@heroui/react
 import { Briefcase, Camera, FileText, Person, Wallet } from "@gravity-ui/icons";
 import toast from "react-hot-toast";
 import { useSession } from "@/lib/auth-client";
+import { uploadImageToImgBB } from "@/lib/uploadImageToImgBB";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8008";
 const specializations = ["Business Law", "Family Law", "Property Law", "Criminal Law", "Tax & Finance", "Civil Litigation"];
@@ -16,6 +17,7 @@ export default function ManageLegalProfilePage() {
     const [lawyer, setLawyer] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         bio: "",
@@ -58,6 +60,24 @@ export default function ManageLegalProfilePage() {
 
     const handleChange = (field, value) => {
         setFormData((current) => ({ ...current, [field]: value }));
+    };
+
+    const handleImageUpload = async (e) => {
+        const imageFile = e.target.files?.[0];
+        if (!imageFile) return;
+
+        setIsUploading(true);
+
+        try {
+            const imageUrl = await uploadImageToImgBB(imageFile);
+            handleChange("photoUrl", imageUrl);
+            toast.success("Image uploaded successfully!");
+        } catch (err) {
+            console.error(err);
+            toast.error(err.message || "Image upload failed.");
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     const handleUpdate = async (e) => {
@@ -158,11 +178,13 @@ export default function ManageLegalProfilePage() {
                             </div>
 
                             <TextField isRequired className="flex flex-col gap-1.5">
-                                <Label className="text-sm font-semibold text-slate-700">Image URL</Label>
-                                <InputGroup className="flex h-12 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-[#1E3A5F] focus-within:bg-white">
+                                <Label className="text-sm font-semibold text-slate-700">Profile Image</Label>
+                                <InputGroup className="flex min-h-12 flex-col items-start justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 focus-within:border-[#1E3A5F] focus-within:bg-white">
                                     <Camera className="h-4 w-4 text-slate-400" />
-                                    <Input value={formData.photoUrl} onChange={(e) => handleChange("photoUrl", e.target.value)} className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none" />
+                                    <Input type="file" accept="image/*" onChange={handleImageUpload} className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none file:mr-4 file:rounded-lg file:border-0 file:bg-[#1E3A5F] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white" />
+                                    {isUploading && <span className="text-xs font-semibold text-[#1E3A5F]">Uploading...</span>}
                                 </InputGroup>
+                                {formData.photoUrl && <p className="truncate text-xs font-medium text-slate-500">{formData.photoUrl}</p>}
                             </TextField>
 
                             <div className="flex flex-col gap-1.5 sm:col-span-2">

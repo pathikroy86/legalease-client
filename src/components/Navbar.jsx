@@ -13,6 +13,7 @@ import {
     ChevronDown,
 } from "@gravity-ui/icons";
 import { signOut, useSession } from "@/lib/auth-client";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8008";
 
@@ -193,19 +194,23 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* Mobile Menu Button */}
-                <button
-                    type="button"
-                    onClick={() => setIsMenuOpen((current) => !current)}
-                    className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 text-slate-700 transition hover:bg-slate-50 xl:hidden"
-                    aria-label="Toggle navigation menu"
-                >
-                    {isMenuOpen ? (
-                        <Xmark className="h-5 w-5" />
-                    ) : (
-                        <Bars className="h-5 w-5" />
-                    )}
-                </button>
+                <div className="flex items-center gap-3">
+                    <ThemeToggle />
+
+                    {/* Mobile Menu Button */}
+                    <button
+                        type="button"
+                        onClick={() => setIsMenuOpen((current) => !current)}
+                        className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 text-slate-700 transition hover:bg-slate-50 xl:hidden"
+                        aria-label="Toggle navigation menu"
+                    >
+                        {isMenuOpen ? (
+                            <Xmark className="h-5 w-5" />
+                        ) : (
+                            <Bars className="h-5 w-5" />
+                        )}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Menu */}

@@ -1,4 +1,3 @@
-import React from "react";
 import Link from "next/link";
 import {
     Books,
@@ -55,29 +54,28 @@ const categories = [
     },
 ];
 
-const LegalCategories = () => {
+export default function CategoriesPage() {
     return (
-        <section className="bg-[#F8FAFC] px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <section className="min-h-screen bg-[#F8FAFC] px-4 py-10 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
-                <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                <div className="flex flex-col gap-4 border-b border-slate-200 pb-8 md:flex-row md:items-end md:justify-between">
                     <div className="max-w-2xl">
                         <p className="text-xs font-bold uppercase tracking-wide text-[#C9A646] sm:text-sm">
                             Legal Categories
                         </p>
-                        <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-                            Choose the right legal expert for your case
-                        </h2>
+                        <h1 className="mt-4 text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
+                            Explore all legal categories
+                        </h1>
                         <p className="mt-4 text-base leading-7 text-slate-600">
-                            Explore popular practice areas and connect with verified advocates who match your legal need.
+                            Choose a practice area and browse approved lawyers who can help with that type of legal work.
                         </p>
                     </div>
 
                     <Link
-                        href="/categories"
-                        className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 text-sm font-bold text-[#1E3A5F] shadow-sm transition hover:border-[#C9A646] hover:bg-[#EEF4F8]"
+                        href="/lawyers"
+                        className="inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-bold text-[#1E3A5F] shadow-sm transition hover:border-[#C9A646] hover:bg-[#EEF4F8]"
                     >
-                        View All Categories
-                        <CircleArrowRight className="h-4 w-4" />
+                        Browse All Lawyers
                     </Link>
                 </div>
 
@@ -101,9 +99,9 @@ const LegalCategories = () => {
                                     </span>
                                 </div>
 
-                                <h3 className="mt-6 text-xl font-bold text-slate-950">
+                                <h2 className="mt-6 text-xl font-bold text-slate-950">
                                     {category.title}
-                                </h3>
+                                </h2>
                                 <p className="mt-3 min-h-[72px] text-sm leading-6 text-slate-600">
                                     {category.description}
                                 </p>
@@ -119,6 +117,4 @@ const LegalCategories = () => {
             </div>
         </section>
     );
-};
-
-export default LegalCategories;
+}

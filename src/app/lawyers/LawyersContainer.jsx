@@ -64,6 +64,18 @@ const LawyersContainer = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const specialization = new URLSearchParams(window.location.search).get("specialization");
+
+            if (specialization && specializations.includes(specialization)) {
+                setSelectedSpecialization(specialization);
+            }
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     const queryString = useMemo(() => {
         const params = new URLSearchParams();
 

@@ -22,6 +22,7 @@ const lawyerLinks = [
 const adminLinks = [
     { href: "/dashboard", label: "Profile", icon: House },
     { href: "/dashboard/admin/manage-users", label: "Manage Users", icon: Person },
+    { href: "/dashboard/admin/manage-lawyers", label: "Manage Lawyers", icon: Briefcase },
     { href: "/dashboard/admin/analytics", label: "Analytics", icon: ChartColumn },
 ];
 

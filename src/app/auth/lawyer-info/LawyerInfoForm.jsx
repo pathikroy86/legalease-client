@@ -105,8 +105,8 @@ const LawyerInfoForm = ({ initialName = "", initialEmail = "" }) => {
                 return;
             }
 
-            toast.success("Lawyer information saved successfully!");
-            router.push("/");
+            toast.success("Lawyer information submitted for admin approval!");
+            router.push("/dashboard");
             router.refresh();
         } catch (err) {
             console.error(err);

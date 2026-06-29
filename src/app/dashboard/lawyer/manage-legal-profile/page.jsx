@@ -35,7 +35,7 @@ export default function ManageLegalProfilePage() {
         const loadProfile = async () => {
             try {
                 setIsLoading(true);
-                const res = await fetch(`${apiUrl}/api/lawyers/${user.email}`);
+                const res = await fetch(`${apiUrl}/api/admin/lawyers/${user.email}`);
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.message || "Legal profile could not be loaded.");
                 setLawyer(data?._id ? data : null);
@@ -47,6 +47,7 @@ export default function ManageLegalProfilePage() {
                     photoUrl: data?.photoUrl || user.image || "",
                     status: data?.status || "Available",
                     city: data?.city || "",
+                    approvalStatus: data?.approvalStatus || "pending",
                 });
             } catch (err) {
                 console.error(err);
@@ -96,6 +97,7 @@ export default function ManageLegalProfilePage() {
             const payload = {
                 ...formData,
                 email: user.email,
+                approvalStatus: "pending",
                 status: formData.status || "Available",
                 city: formData.city || "Online",
             };
@@ -136,7 +138,8 @@ export default function ManageLegalProfilePage() {
                 });
             }
 
-            toast.success(lawyer ? "Legal profile updated successfully!" : "Legal profile created successfully!");
+            setLawyer((current) => current ? { ...current, ...payload } : current);
+            toast.success("Legal profile submitted for admin approval!");
         } catch (err) {
             console.error(err);
             toast.error("Legal profile could not be updated.");
@@ -174,6 +177,11 @@ export default function ManageLegalProfilePage() {
                         {!lawyer && (
                             <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-700">
                                 No legal service profile found. Please complete the lawyer information form first.
+                            </div>
+                        )}
+                        {lawyer && (
+                            <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700">
+                                Approval Status: <span className="capitalize text-[#1E3A5F]">{lawyer.approvalStatus || "pending"}</span>
                             </div>
                         )}
 

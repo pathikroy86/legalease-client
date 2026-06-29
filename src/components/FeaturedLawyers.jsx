@@ -47,14 +47,12 @@ const FeaturedLawyers = () => {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        const controller = new AbortController();
         let isMounted = true;
 
         const loadLawyers = async () => {
             try {
                 const res = await fetch(`${apiUrl}/api/lawyers/featured`, {
                     cache: "no-store",
-                    signal: controller.signal,
                 });
 
                 const data = await res.json();
@@ -67,8 +65,6 @@ const FeaturedLawyers = () => {
                     setLawyers(Array.isArray(data) ? data : []);
                 }
             } catch (err) {
-                if (err.name === "AbortError") return;
-
                 console.error(err);
                 if (isMounted) {
                     setError(err.message || "Featured lawyers could not be loaded.");
@@ -84,7 +80,6 @@ const FeaturedLawyers = () => {
 
         return () => {
             isMounted = false;
-            controller.abort();
         };
     }, []);
 

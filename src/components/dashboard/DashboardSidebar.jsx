@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { House, FileText, Person, Envelope, ScalesBalanced } from "@gravity-ui/icons";
+import { House, FileText, Person, Envelope, Briefcase, ScalesBalanced } from "@gravity-ui/icons";
 import { useSession } from "@/lib/auth-client";
 
 const userLinks = [
@@ -12,11 +12,18 @@ const userLinks = [
     { href: "/dashboard/user/comments", label: "Comments", icon: Envelope },
 ];
 
+const lawyerLinks = [
+    { href: "/dashboard", label: "Profile", icon: House },
+    { href: "/dashboard/lawyer/hiring-history", label: "Hiring Requests", icon: FileText },
+    { href: "/dashboard/lawyer/manage-legal-profile", label: "Legal Profile", icon: Briefcase },
+];
+
 const DashboardSidebar = () => {
     const pathname = usePathname();
     const router = useRouter();
     const { data: session, isPending } = useSession();
     const user = session?.user;
+    const navLinks = user?.role === "lawyer" ? lawyerLinks : userLinks;
 
     if (!isPending && !user) {
         router.push("/auth/signin");
@@ -33,7 +40,7 @@ const DashboardSidebar = () => {
             </Link>
 
             <nav className="mt-5 grid grid-cols-2 gap-2 lg:grid-cols-1">
-                {userLinks.map((item) => {
+                {navLinks.map((item) => {
                     const Icon = item.icon;
                     const isActive = item.href === "/dashboard"
                         ? pathname === item.href
@@ -59,4 +66,3 @@ const DashboardSidebar = () => {
 };
 
 export default DashboardSidebar;
-

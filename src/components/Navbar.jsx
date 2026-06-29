@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@heroui/react";
 import {
@@ -12,6 +13,8 @@ import {
     ChevronDown,
 } from "@gravity-ui/icons";
 import { signOut, useSession } from "@/lib/auth-client";
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8008";
 
 const navLinks = [
     {
@@ -35,9 +38,28 @@ const navLinks = [
 const Navbar = () => {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [profile, setProfile] = useState(null);
     const { data: session } = useSession();
 
     const user = session?.user;
+    const displayName = profile?.name || user?.name || "User";
+    const profileImage = profile?.image || profile?.profileImage || user?.image;
+
+    useEffect(() => {
+        if (!user?.email) return;
+
+        const loadProfile = async () => {
+            try {
+                const res = await fetch(`${apiUrl}/api/user-profile?email=${user.email}`);
+                const data = await res.json();
+                setProfile(data?._id ? data : null);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        loadProfile();
+    }, [user?.email]);
 
     const handleSignOut = async () => {
         await signOut();
@@ -123,11 +145,22 @@ const Navbar = () => {
                         {user ? (
                             <>
                                 <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 py-1.5 pl-2 pr-4">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-bold text-white">
-                                        {getInitials(user.name)}
-                                    </div>
+                                    {profileImage ? (
+                                        <Image
+                                            src={profileImage}
+                                            alt={displayName}
+                                            width={36}
+                                            height={36}
+                                            unoptimized
+                                            className="h-9 w-9 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-bold text-white">
+                                            {getInitials(displayName)}
+                                        </div>
+                                    )}
                                     <span className="max-w-32 truncate text-sm font-semibold text-slate-700">
-                                        {user.name}
+                                        {displayName}
                                     </span>
                                 </div>
 
@@ -209,12 +242,23 @@ const Navbar = () => {
                             {user ? (
                                 <>
                                     <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-bold text-white">
-                                            {getInitials(user.name)}
-                                        </div>
+                                        {profileImage ? (
+                                            <Image
+                                                src={profileImage}
+                                                alt={displayName}
+                                                width={40}
+                                                height={40}
+                                                unoptimized
+                                                className="h-10 w-10 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1E3A5F] text-sm font-bold text-white">
+                                                {getInitials(displayName)}
+                                            </div>
+                                        )}
                                         <div className="min-w-0">
                                             <p className="truncate text-sm font-bold text-slate-900">
-                                                {user.name}
+                                                {displayName}
                                             </p>
                                             <p className="truncate text-xs font-medium text-slate-500">
                                                 {user.email}
@@ -258,3 +302,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

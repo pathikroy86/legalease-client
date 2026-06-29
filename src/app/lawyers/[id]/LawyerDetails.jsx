@@ -35,6 +35,8 @@ const LawyerDetails = ({ lawyerId }) => {
     const [isHiring, setIsHiring] = useState(false);
     const [isCommenting, setIsCommenting] = useState(false);
     const [isHireModalOpen, setIsHireModalOpen] = useState(false);
+    const [hasHired, setHasHired] = useState(false);
+    const [isCheckingHire, setIsCheckingHire] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => {
@@ -72,6 +74,51 @@ const LawyerDetails = ({ lawyerId }) => {
             isMounted = false;
         };
     }, [lawyerId]);
+
+    useEffect(() => {
+        if (!user?.email || !lawyer?.email) {
+            const timer = setTimeout(() => {
+                setHasHired(false);
+            }, 0);
+
+            return () => clearTimeout(timer);
+        }
+
+        let isMounted = true;
+
+        const loadHireStatus = async () => {
+            try {
+                setIsCheckingHire(true);
+                const params = new URLSearchParams({
+                    clientEmail: user.email,
+                    lawyerEmail: lawyer.email,
+                });
+                const res = await fetch(`${apiUrl}/api/hires?${params.toString()}`, {
+                    cache: "no-store",
+                });
+                const data = await res.json();
+
+                if (isMounted) {
+                    setHasHired(Array.isArray(data) && data.length > 0);
+                }
+            } catch (err) {
+                console.error(err);
+                if (isMounted) {
+                    setHasHired(false);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsCheckingHire(false);
+                }
+            }
+        };
+
+        loadHireStatus();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [lawyer?.email, user?.email]);
 
     useEffect(() => {
         let isMounted = true;
@@ -146,6 +193,7 @@ const LawyerDetails = ({ lawyerId }) => {
             }
 
             toast.success("Hire request submitted successfully!");
+            setHasHired(true);
             setIsHireModalOpen(false);
         } catch (err) {
             console.error(err);
@@ -165,6 +213,11 @@ const LawyerDetails = ({ lawyerId }) => {
 
         if (!commentText.trim()) {
             toast.error("Please write a comment first.");
+            return;
+        }
+
+        if (!hasHired) {
+            toast.error("Only users who have hired this lawyer can comment.");
             return;
         }
 
@@ -319,11 +372,17 @@ const LawyerDetails = ({ lawyerId }) => {
                         <textarea
                             value={commentText}
                             onChange={(e) => setCommentText(e.target.value)}
-                            placeholder={user ? "Write your comment..." : "Login to write a comment"}
+                            disabled={user && (!hasHired || isCheckingHire)}
+                            placeholder={!user ? "Login to write a comment" : hasHired ? "Write your comment..." : "Hire this lawyer first to write a comment"}
                             rows={4}
                             className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#1E3A5F] focus:bg-white"
                         />
-                        <Button type="submit" isLoading={isCommenting} className="mt-3 h-11 bg-[#1E3A5F] font-bold text-white">
+                        {user && !hasHired && (
+                            <p className="mt-2 text-sm font-semibold text-amber-700">
+                                Only users who have hired this lawyer can comment.
+                            </p>
+                        )}
+                        <Button type="submit" isLoading={isCommenting} isDisabled={user && (!hasHired || isCheckingHire)} className="mt-3 h-11 bg-[#1E3A5F] font-bold text-white">
                             Post Comment
                         </Button>
                     </form>

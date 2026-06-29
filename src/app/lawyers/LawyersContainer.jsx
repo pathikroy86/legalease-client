@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Briefcase, Clock, MapPin, Magnifier, Wallet } from "@gravity-ui/icons";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8008";
+const lawyersPerPage = 6;
 
 const specializations = [
     "Business Law",
@@ -61,6 +62,7 @@ const LawyersContainer = () => {
     const [selectedSpecialization, setSelectedSpecialization] = useState("all");
     const [selectedStatus, setSelectedStatus] = useState("all");
     const [sortBy, setSortBy] = useState("newest");
+    const [currentPage, setCurrentPage] = useState(1);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -97,6 +99,31 @@ const LawyersContainer = () => {
 
         return params.toString();
     }, [searchQuery, selectedSpecialization, selectedStatus, sortBy]);
+
+    const totalPages = Math.ceil(lawyers.length / lawyersPerPage) || 1;
+    const activePage = Math.min(currentPage, totalPages);
+    const startIndex = (activePage - 1) * lawyersPerPage;
+    const paginatedLawyers = lawyers.slice(startIndex, startIndex + lawyersPerPage);
+
+    const handleSearchChange = (value) => {
+        setSearchQuery(value);
+        setCurrentPage(1);
+    };
+
+    const handleSpecializationChange = (value) => {
+        setSelectedSpecialization(value);
+        setCurrentPage(1);
+    };
+
+    const handleStatusChange = (value) => {
+        setSelectedStatus(value);
+        setCurrentPage(1);
+    };
+
+    const handleSortChange = (value) => {
+        setSortBy(value);
+        setCurrentPage(1);
+    };
 
     useEffect(() => {
         const controller = new AbortController();
@@ -177,7 +204,7 @@ const LawyersContainer = () => {
                                 <input
                                     type="search"
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
                                     placeholder="Name, city, or specialization"
                                     className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400"
                                 />
@@ -188,7 +215,7 @@ const LawyersContainer = () => {
                             <label className="mb-2 block text-sm font-bold text-slate-700">Specialization</label>
                             <select
                                 value={selectedSpecialization}
-                                onChange={(e) => setSelectedSpecialization(e.target.value)}
+                                onChange={(e) => handleSpecializationChange(e.target.value)}
                                 className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 outline-none focus:border-[#1E3A5F] focus:bg-white"
                             >
                                 <option value="all">All Specializations</option>
@@ -202,7 +229,7 @@ const LawyersContainer = () => {
                             <label className="mb-2 block text-sm font-bold text-slate-700">Status</label>
                             <select
                                 value={selectedStatus}
-                                onChange={(e) => setSelectedStatus(e.target.value)}
+                                onChange={(e) => handleStatusChange(e.target.value)}
                                 className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 outline-none focus:border-[#1E3A5F] focus:bg-white"
                             >
                                 <option value="all">All</option>
@@ -215,7 +242,7 @@ const LawyersContainer = () => {
                             <label className="mb-2 block text-sm font-bold text-slate-700">Sort</label>
                             <select
                                 value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
+                                onChange={(e) => handleSortChange(e.target.value)}
                                 className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-semibold text-slate-700 outline-none focus:border-[#1E3A5F] focus:bg-white"
                             >
                                 {sortOptions.map((option) => (
@@ -227,12 +254,12 @@ const LawyersContainer = () => {
                 </div>
 
                 <div className="mt-6 text-sm font-semibold text-slate-500">
-                    {isLoading ? "Loading lawyers..." : `Showing ${lawyers.length} lawyer${lawyers.length === 1 ? "" : "s"}`}
+                    {isLoading ? "Loading lawyers..." : `Showing ${paginatedLawyers.length} of ${lawyers.length} lawyer${lawyers.length === 1 ? "" : "s"}`}
                 </div>
 
                 {isLoading && (
                     <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                        {[...Array(8)].map((_, index) => (
+                        {[...Array(6)].map((_, index) => (
                             <LawyerSkeleton key={index} />
                         ))}
                     </div>
@@ -254,61 +281,103 @@ const LawyersContainer = () => {
                 )}
 
                 {!isLoading && !error && lawyers.length > 0 && (
-                    <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                        {lawyers.map((lawyer) => {
-                            const lawyerId = getLawyerId(lawyer);
-                            const isBusy = lawyer.status === "Busy";
+                    <>
+                        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
+                            {paginatedLawyers.map((lawyer) => {
+                                const lawyerId = getLawyerId(lawyer);
+                                const isBusy = lawyer.status === "Busy";
 
-                            return (
-                                <Link
-                                    key={lawyerId}
-                                    href={`/lawyers/${lawyerId}`}
-                                    className="group rounded-[16px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-950/5 transition hover:-translate-y-1 hover:border-[#C9A646] hover:shadow-xl hover:shadow-slate-950/10"
-                                >
-                                    <div className="relative">
-                                        {lawyer.photoUrl ? (
-                                            <Image
-                                                src={lawyer.photoUrl}
-                                                alt={`${lawyer.name || "Lawyer"} profile`}
-                                                width={320}
-                                                height={240}
-                                                unoptimized
-                                                className="aspect-[4/3] w-full rounded-xl object-cover"
-                                            />
-                                        ) : (
-                                            <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl bg-[#1E3A5F] text-2xl font-bold text-white">
-                                                {getInitials(lawyer.name)}
+                                return (
+                                    <Link
+                                        key={lawyerId}
+                                        href={`/lawyers/${lawyerId}`}
+                                        className="group rounded-[16px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-950/5 transition hover:-translate-y-1 hover:border-[#C9A646] hover:shadow-xl hover:shadow-slate-950/10"
+                                    >
+                                        <div className="relative">
+                                            {lawyer.photoUrl ? (
+                                                <Image
+                                                    src={lawyer.photoUrl}
+                                                    alt={`${lawyer.name || "Lawyer"} profile`}
+                                                    width={320}
+                                                    height={240}
+                                                    unoptimized
+                                                    className="aspect-[4/3] w-full rounded-xl object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl bg-[#1E3A5F] text-2xl font-bold text-white">
+                                                    {getInitials(lawyer.name)}
+                                                </div>
+                                            )}
+
+                                            {isBusy && (
+                                                <span className="absolute right-3 top-3 rounded-full bg-rose-600 px-3 py-1 text-xs font-bold text-white shadow-lg shadow-rose-950/20">
+                                                    Busy
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <h2 className="mt-4 truncate text-base font-bold text-slate-950 sm:text-lg">
+                                            {lawyer.name || "Legal Expert"}
+                                        </h2>
+                                        <p className="mt-1 min-h-10 text-sm font-semibold leading-5 text-[#1E3A5F]">
+                                            {lawyer.specialization || "Legal Consultant"}
+                                        </p>
+
+                                        <div className="mt-4 space-y-2 text-xs font-semibold text-slate-600 sm:text-sm">
+                                            <div className="flex items-center gap-2">
+                                                <Wallet className="h-4 w-4 shrink-0 text-[#C9A646]" />
+                                                {lawyer.consultationFee ? `$${lawyer.consultationFee} / hour` : "Rate negotiable"}
                                             </div>
-                                        )}
-
-                                        {isBusy && (
-                                            <span className="absolute right-3 top-3 rounded-full bg-rose-600 px-3 py-1 text-xs font-bold text-white shadow-lg shadow-rose-950/20">
-                                                Busy
-                                            </span>
-                                        )}
-                                    </div>
-
-                                    <h2 className="mt-4 truncate text-base font-bold text-slate-950 sm:text-lg">
-                                        {lawyer.name || "Legal Expert"}
-                                    </h2>
-                                    <p className="mt-1 min-h-10 text-sm font-semibold leading-5 text-[#1E3A5F]">
-                                        {lawyer.specialization || "Legal Consultant"}
-                                    </p>
-
-                                    <div className="mt-4 space-y-2 text-xs font-semibold text-slate-600 sm:text-sm">
-                                        <div className="flex items-center gap-2">
-                                            <Wallet className="h-4 w-4 shrink-0 text-[#C9A646]" />
-                                            {lawyer.consultationFee ? `$${lawyer.consultationFee} / hour` : "Rate negotiable"}
+                                            <div className="flex items-center gap-2">
+                                                {lawyer.city ? <MapPin className="h-4 w-4 shrink-0 text-[#C9A646]" /> : <Clock className="h-4 w-4 shrink-0 text-[#C9A646]" />}
+                                                <span className="truncate">{lawyer.city || "Online"}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            {lawyer.city ? <MapPin className="h-4 w-4 shrink-0 text-[#C9A646]" /> : <Clock className="h-4 w-4 shrink-0 text-[#C9A646]" />}
-                                            <span className="truncate">{lawyer.city || "Online"}</span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            );
-                        })}
-                    </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+
+                        {totalPages > 1 && (
+                            <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+                                    disabled={activePage === 1}
+                                    className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-bold text-[#1E3A5F] disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    Previous
+                                </button>
+
+                                {[...Array(totalPages)].map((_, index) => {
+                                    const pageNumber = index + 1;
+
+                                    return (
+                                        <button
+                                            key={pageNumber}
+                                            type="button"
+                                            onClick={() => setCurrentPage(pageNumber)}
+                                            className={`h-10 w-10 rounded-lg text-sm font-bold ${pageNumber === activePage
+                                                ? "bg-[#1E3A5F] text-white"
+                                                : "border border-slate-200 bg-white text-[#1E3A5F]"
+                                                }`}
+                                        >
+                                            {pageNumber}
+                                        </button>
+                                    );
+                                })}
+
+                                <button
+                                    type="button"
+                                    onClick={() => setCurrentPage((page) => Math.min(page + 1, totalPages))}
+                                    disabled={activePage === totalPages}
+                                    className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-bold text-[#1E3A5F] disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </section>

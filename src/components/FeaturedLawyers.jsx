@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@heroui/react";
 import { Briefcase, CircleArrowRight, Clock, MapPin, Wallet } from "@gravity-ui/icons";
 import { motion } from "framer-motion";
 
@@ -198,14 +197,12 @@ const FeaturedLawyers = () => {
                                         </div>
                                     </div>
 
-                                    <Button
-                                        as={Link}
+                                    <Link
                                         href={`/lawyers/${lawyerId}`}
-                                        radius="lg"
-                                        className="mt-6 h-11 w-full rounded-lg bg-[#1E3A5F] font-semibold text-white hover:bg-[#162c49]"
+                                        className="mt-6 flex h-11 w-full items-center justify-center rounded-lg bg-[#1E3A5F] font-semibold text-white hover:bg-[#162c49]"
                                     >
                                         View Profile
-                                    </Button>
+                                    </Link>
                                 </motion.article>
                             );
                         })}

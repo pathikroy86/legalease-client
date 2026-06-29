@@ -38,14 +38,12 @@ const LawyerDetails = ({ lawyerId }) => {
     const [error, setError] = useState("");
 
     useEffect(() => {
-        const controller = new AbortController();
         let isMounted = true;
 
         const loadLawyer = async () => {
             try {
                 const res = await fetch(`${apiUrl}/api/lawyers/${lawyerId}`, {
                     cache: "no-store",
-                    signal: controller.signal,
                 });
                 const data = await res.json();
 
@@ -57,8 +55,6 @@ const LawyerDetails = ({ lawyerId }) => {
                     setLawyer(data?._id ? data : null);
                 }
             } catch (err) {
-                if (err.name === "AbortError") return;
-
                 console.error(err);
                 if (isMounted) {
                     setError(err.message || "Lawyer details could not be loaded.");
@@ -74,19 +70,16 @@ const LawyerDetails = ({ lawyerId }) => {
 
         return () => {
             isMounted = false;
-            controller.abort();
         };
     }, [lawyerId]);
 
     useEffect(() => {
-        const controller = new AbortController();
         let isMounted = true;
 
         const loadComments = async () => {
             try {
                 const res = await fetch(`${apiUrl}/api/comments?lawyerId=${lawyerId}`, {
                     cache: "no-store",
-                    signal: controller.signal,
                 });
                 const data = await res.json();
 
@@ -94,7 +87,6 @@ const LawyerDetails = ({ lawyerId }) => {
                     setComments(Array.isArray(data) ? data : []);
                 }
             } catch (err) {
-                if (err.name === "AbortError") return;
                 console.error(err);
             }
         };
@@ -103,7 +95,6 @@ const LawyerDetails = ({ lawyerId }) => {
 
         return () => {
             isMounted = false;
-            controller.abort();
         };
     }, [lawyerId]);
 

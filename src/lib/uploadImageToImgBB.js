@@ -7,7 +7,14 @@ export const uploadImageToImgBB = async (imageFile) => {
         body: imageData,
     });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data = {};
+
+    try {
+        data = text ? JSON.parse(text) : {};
+    } catch {
+        data = { message: text || "Image could not be uploaded." };
+    }
 
     if (!res.ok || !data.url) {
         throw new Error(data.message || "Image could not be uploaded.");

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Button, Card, Input, InputGroup, Label, TextField } from "@heroui/react";
 import { Briefcase, Camera, FileText, Person, Wallet } from "@gravity-ui/icons";
 import toast from "react-hot-toast";
@@ -92,24 +93,50 @@ export default function ManageLegalProfilePage() {
         setIsSaving(true);
 
         try {
-            const id = lawyer ? getLawyerId(lawyer) : user.email;
             const payload = {
                 ...formData,
                 email: user.email,
+                status: formData.status || "Available",
+                city: formData.city || "Online",
             };
-            const res = await fetch(`${apiUrl}/api/lawyers/${id}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
+
+            const res = lawyer
+                ? await fetch(`${apiUrl}/api/lawyers/${getLawyerId(lawyer)}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                })
+                : await fetch(`${apiUrl}/api/lawyers`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+
             const result = await res.json();
 
-            if (!res.ok || !result.modifiedCount) {
+            if (!res.ok) {
                 toast.error(result.message || "Legal profile could not be updated.");
                 return;
             }
 
-            toast.success("Legal profile updated successfully!");
+            if (lawyer && !result.modifiedCount && !result.matchedCount) {
+                toast.error(result.message || "Legal profile could not be updated.");
+                return;
+            }
+
+            if (!lawyer && !result.insertedId) {
+                toast.error(result.message || "Legal profile could not be created.");
+                return;
+            }
+
+            if (!lawyer) {
+                setLawyer({
+                    _id: result.insertedId,
+                    ...payload,
+                });
+            }
+
+            toast.success(lawyer ? "Legal profile updated successfully!" : "Legal profile created successfully!");
         } catch (err) {
             console.error(err);
             toast.error("Legal profile could not be updated.");
@@ -179,10 +206,24 @@ export default function ManageLegalProfilePage() {
 
                             <TextField isRequired className="flex flex-col gap-1.5">
                                 <Label className="text-sm font-semibold text-slate-700">Profile Image</Label>
+                                {formData.photoUrl && (
+                                    <Image
+                                        src={formData.photoUrl}
+                                        alt={formData.name || "Lawyer profile"}
+                                        width={96}
+                                        height={96}
+                                        unoptimized
+                                        className="h-24 w-24 rounded-2xl object-cover"
+                                    />
+                                )}
                                 <InputGroup className="flex min-h-12 flex-col items-start justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 focus-within:border-[#1E3A5F] focus-within:bg-white">
                                     <Camera className="h-4 w-4 text-slate-400" />
-                                    <Input type="file" accept="image/*" onChange={handleImageUpload} className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none file:mr-4 file:rounded-lg file:border-0 file:bg-[#1E3A5F] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white" />
+                                    <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-sm font-medium text-slate-900 file:mr-4 file:rounded-lg file:border-0 file:bg-[#1E3A5F] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white" />
                                     {isUploading && <span className="text-xs font-semibold text-[#1E3A5F]">Uploading...</span>}
+                                </InputGroup>
+                                <InputGroup className="flex h-12 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-[#1E3A5F] focus-within:bg-white">
+                                    <Camera className="h-4 w-4 text-slate-400" />
+                                    <Input value={formData.photoUrl} onChange={(e) => handleChange("photoUrl", e.target.value)} placeholder="Or paste image URL" className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400" />
                                 </InputGroup>
                                 {formData.photoUrl && <p className="truncate text-xs font-medium text-slate-500">{formData.photoUrl}</p>}
                             </TextField>
@@ -196,7 +237,7 @@ export default function ManageLegalProfilePage() {
                             </div>
 
                             <div className="flex gap-3 sm:col-span-2">
-                                <Button type="submit" isLoading={isSaving} className="h-11 bg-[#1E3A5F] font-bold text-white">Update Service</Button>
+                                <Button type="submit" isLoading={isSaving} isDisabled={isUploading} className="h-11 bg-[#1E3A5F] font-bold text-white">Update Service</Button>
                                 <Button type="button" onPress={handleDelete} isDisabled={!lawyer} variant="bordered" className="h-11 border-rose-200 font-bold text-rose-600">Delete Service</Button>
                             </div>
                         </form>

@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 export const POST = async (request) => {
     try {
         const imgbbApiKey = process.env.IMGBB_API_KEY;
@@ -13,8 +15,14 @@ export const POST = async (request) => {
             return Response.json({ message: "Image file is required." }, { status: 400 });
         }
 
+        if (!image.type?.startsWith("image/")) {
+            return Response.json({ message: "Please upload an image file." }, { status: 400 });
+        }
+
+        const buffer = Buffer.from(await image.arrayBuffer());
+        const base64Image = buffer.toString("base64");
         const uploadData = new FormData();
-        uploadData.append("image", image);
+        uploadData.append("image", base64Image);
 
         const res = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
             method: "POST",

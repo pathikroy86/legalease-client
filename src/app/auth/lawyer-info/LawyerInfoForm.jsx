@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
     Button,
@@ -156,10 +157,24 @@ const LawyerInfoForm = ({ initialName = "", initialEmail = "" }) => {
 
                             <TextField isRequired name="photoUrl" className="flex flex-col gap-1.5 sm:col-span-2">
                                 <Label className="text-sm font-semibold text-slate-700">Profile Photo</Label>
+                                {formData.photoUrl && (
+                                    <Image
+                                        src={formData.photoUrl}
+                                        alt={formData.name || "Lawyer profile"}
+                                        width={96}
+                                        height={96}
+                                        unoptimized
+                                        className="h-24 w-24 rounded-2xl object-cover"
+                                    />
+                                )}
                                 <InputGroup className="flex min-h-12 flex-col items-start justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 focus-within:border-[#1E3A5F] focus-within:bg-white sm:flex-row sm:items-center">
                                     <Camera className="h-4 w-4 text-slate-400" />
-                                    <Input type="file" accept="image/*" onChange={handleImageUpload} className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none file:mr-4 file:rounded-lg file:border-0 file:bg-[#1E3A5F] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white" />
+                                    <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full text-sm font-medium text-slate-900 file:mr-4 file:rounded-lg file:border-0 file:bg-[#1E3A5F] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white" />
                                     {isUploading && <span className="text-xs font-semibold text-[#1E3A5F]">Uploading...</span>}
+                                </InputGroup>
+                                <InputGroup className="flex h-12 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 focus-within:border-[#1E3A5F] focus-within:bg-white">
+                                    <Camera className="h-4 w-4 text-slate-400" />
+                                    <Input value={formData.photoUrl} onChange={(e) => handleChange("photoUrl", e.target.value)} placeholder="Or paste image URL" className="w-full border-none bg-transparent text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400" />
                                 </InputGroup>
                                 {formData.photoUrl && <p className="truncate text-xs font-medium text-slate-500">{formData.photoUrl}</p>}
                             </TextField>
@@ -209,7 +224,7 @@ const LawyerInfoForm = ({ initialName = "", initialEmail = "" }) => {
                             </div>
                         </div>
 
-                        <Button type="submit" radius="lg" isLoading={isLoading} className="h-12 w-full bg-[#1E3A5F] font-bold text-white hover:bg-[#162c49]">
+                        <Button type="submit" radius="lg" isLoading={isLoading} isDisabled={isUploading} className="h-12 w-full bg-[#1E3A5F] font-bold text-white hover:bg-[#162c49]">
                             Save Lawyer Information
                         </Button>
                     </form>

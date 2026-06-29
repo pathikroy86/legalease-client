@@ -1,8 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { House, FileText, Person, Envelope, Briefcase, ScalesBalanced } from "@gravity-ui/icons";
+import { House, FileText, Person, Envelope, Briefcase, ScalesBalanced, ChartColumn } from "@gravity-ui/icons";
 import { useSession } from "@/lib/auth-client";
 
 const userLinks = [
@@ -18,16 +19,24 @@ const lawyerLinks = [
     { href: "/dashboard/lawyer/manage-legal-profile", label: "Legal Profile", icon: Briefcase },
 ];
 
+const adminLinks = [
+    { href: "/dashboard", label: "Profile", icon: House },
+    { href: "/dashboard/admin/manage-users", label: "Manage Users", icon: Person },
+    { href: "/dashboard/admin/analytics", label: "Analytics", icon: ChartColumn },
+];
+
 const DashboardSidebar = () => {
     const pathname = usePathname();
     const router = useRouter();
     const { data: session, isPending } = useSession();
     const user = session?.user;
-    const navLinks = user?.role === "lawyer" ? lawyerLinks : userLinks;
+    const navLinks = user?.role === "admin" ? adminLinks : user?.role === "lawyer" ? lawyerLinks : userLinks;
 
-    if (!isPending && !user) {
-        router.push("/auth/signin");
-    }
+    useEffect(() => {
+        if (!isPending && !user) {
+            router.push("/auth/signin");
+        }
+    }, [isPending, router, user]);
 
     return (
         <aside className="w-full shrink-0 border-b border-slate-200 bg-white p-4 lg:min-h-screen lg:w-72 lg:border-b-0 lg:border-r">
